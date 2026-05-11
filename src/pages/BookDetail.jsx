@@ -13,7 +13,7 @@ import {
   subscribeToNotes,
   updateNote,
 } from '../lib/notes.js';
-import { deleteCoverByUrl, uploadCover } from '../lib/storage.js';
+import { deleteCoverByUrl, uploadCover, validateCoverFile } from '../lib/storage.js';
 import LoadingScreen from '../components/LoadingScreen.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
 
@@ -408,8 +408,9 @@ function EditBookDialog({ book, onCancel, onSave }) {
 
   const handleFile = (f) => {
     if (!f) return;
-    if (!f.type.startsWith('image/')) {
-      setError('Please select an image file.');
+    const fileError = validateCoverFile(f);
+    if (fileError) {
+      setError(fileError);
       return;
     }
     setError('');
@@ -461,7 +462,7 @@ function EditBookDialog({ book, onCancel, onSave }) {
             <input
               ref={fileRef}
               type="file"
-              accept="image/*"
+              accept=".jpg,.jpeg,.png,.gif,.webp,.heic,.heif"
               capture="environment"
               className="hidden"
               onChange={(e) => handleFile(e.target.files?.[0] || null)}

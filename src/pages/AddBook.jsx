@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { BOOK_STATUSES, createBook, updateBook } from '../lib/books.js';
-import { uploadCover } from '../lib/storage.js';
+import { uploadCover, validateCoverFile } from '../lib/storage.js';
 
 export default function AddBook() {
   const { user } = useAuth();
@@ -23,8 +23,9 @@ export default function AddBook() {
       setPreview('');
       return;
     }
-    if (!f.type.startsWith('image/')) {
-      setError('Please select an image file.');
+    const fileError = validateCoverFile(f);
+    if (fileError) {
+      setError(fileError);
       return;
     }
     setError('');
@@ -85,7 +86,7 @@ export default function AddBook() {
             <input
               ref={fileRef}
               type="file"
-              accept="image/*"
+              accept=".jpg,.jpeg,.png,.gif,.webp,.heic,.heif"
               capture="environment"
               className="hidden"
               onChange={(e) => handleFile(e.target.files?.[0] || null)}
